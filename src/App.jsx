@@ -96,6 +96,14 @@ export default class App extends Component {
           />
           <STLExport input={this.state.solids} />
         </main>
+        <footer style={{ marginTop: "2em" }}>
+          <div id="link">
+            <a href="https://github.com/settinger/pulsar_generator">
+              <img src="GitHub-Mark-64px.png" />
+              <span style={{ marginLeft: "1em" }}>View source on GitHub</span>
+            </a>
+          </div>
+        </footer>
       </div>
     );
   }
