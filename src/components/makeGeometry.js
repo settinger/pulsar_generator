@@ -46,12 +46,9 @@ const makePolygons = (xArray, yArrays) => {
   return polygons;
 };
 
-const makePolyhedron = (polygon, params = {}) => {
+const makePolyhedron = (polygon, angle) => {
   // The rotate-extrude operation leaves us with a waveform that has to be rotated to return to its original appearance
-  const polyhedron = extrusions.extrudeRotate(
-    { angle: Math.PI / 6, segments: 32 },
-    polygon
-  );
+  const polyhedron = extrusions.extrudeRotate({ angle, segments: 32 }, polygon);
   const newpolyhedron = transforms.rotateX(
     Math.PI / 2,
     transforms.rotateY(Math.PI / 2, polyhedron)
@@ -59,9 +56,9 @@ const makePolyhedron = (polygon, params = {}) => {
   return newpolyhedron;
 };
 
-const makePolyhedra = (polygons) => {
+const makePolyhedra = (polygons, angle) => {
   return polygons.map((polygon) => {
-    return makePolyhedron(polygon);
+    return makePolyhedron(polygon, angle);
   });
 };
 

@@ -27,3 +27,5 @@ sketch
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/vscode,react
+
+out/browserify_bundle.js.tmp*

@@ -1,24 +1,15 @@
 import React, { Component } from "react";
 import { Helmet } from "react-helmet";
-
-import {
-  primitives,
-  extrusions,
-  transforms,
-  expansions,
-} from "@jscad/modeling";
 import { Renderer } from "jscad-react";
 
 import CSVParser from "./components/CSVParser.jsx";
 import {
-  makePolyhedron,
   makePolyhedra,
-  makePolygon,
   makePolygons,
   stack,
 } from "./components/makeGeometry.js";
-
-import MySlider from "./components/MySlider.jsx";
+import BootstrapSlider from "./components/BootstrapSlider.jsx";
+import STLExport from "./components/STLExport.jsx";
 
 export default class App extends Component {
   constructor(props) {
@@ -26,12 +17,15 @@ export default class App extends Component {
     this.updatePulsarData = this.updatePulsarData.bind(this);
     this.generateSolid = this.generateSolid.bind(this);
     this.updateSpacing = this.updateSpacing.bind(this);
+    this.updateAngle = this.updateAngle.bind(this);
     this.state = {
       pulsarX: [],
       pulsarY: [],
       solids: [],
-      spacing: [10],
+      spacing: 10,
+      angle: 30, // NOTICE THIS IS IN DEGREES, JSCAD REQUIRES RADIANS
     };
+    this.polygons = [];
     this.polyhedra = [];
   }
 
@@ -45,15 +39,25 @@ export default class App extends Component {
   generateSolid() {
     const numWaves = this.state.pulsarY.length;
     const numValues = this.state.pulsarX.length;
-    const polygons = makePolygons(this.state.pulsarX, this.state.pulsarY);
-    this.polyhedra = makePolyhedra(polygons);
-    this.setState({ solids: stack(this.polyhedra, this.state.spacing[0]) });
+    this.polygons = makePolygons(this.state.pulsarX, this.state.pulsarY);
+    this.polyhedra = makePolyhedra(
+      this.polygons,
+      (this.state.angle * Math.PI) / 180
+    );
+    this.setState({ solids: stack(this.polyhedra, this.state.spacing) });
   }
 
   // Using the input from the spacing slider, update the distance between polyhedra
   updateSpacing(spacing) {
     this.setState({ spacing });
-    this.setState({ solids: stack(this.polyhedra, spacing[0]) });
+    this.setState({ solids: stack(this.polyhedra, spacing) });
+  }
+
+  updateAngle(angle) {
+    const radians = (angle * Math.PI) / 180;
+    this.polyhedra = makePolyhedra(this.polygons, radians);
+    const solids = stack(this.polyhedra, this.state.spacing);
+    this.setState({ angle, solids });
   }
 
   render() {
@@ -69,15 +73,28 @@ export default class App extends Component {
           </h2>
         </header>
         <main>
+          <p>
+            <i>TODO: explain how to format the .CSV files properly</i>
+          </p>
           <CSVParser updatePulsarData={this.updatePulsarData} />
           <Renderer solids={this.state.solids} height={500} width={500} />
-          <MySlider
+          <BootstrapSlider
             label={"Define the spacing between the pulses: "}
-            mode={1}
-            domain={[0, 20]}
-            values={this.state.spacing}
+            min={0}
+            max={20}
+            step={0.1}
+            value={this.state.spacing}
             onChange={this.updateSpacing}
           />
+          <BootstrapSlider
+            label={"Define the angle of rotation (in degrees): "}
+            min={0}
+            max={180}
+            step={0.1}
+            value={this.state.angle}
+            onChange={this.updateAngle}
+          />
+          <STLExport input={this.state.solids} />
         </main>
       </div>
     );
