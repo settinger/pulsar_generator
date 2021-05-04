@@ -31,7 +31,7 @@ export default class CSVParser extends Component {
     const uploadedFile = event.target.files[0];
     const reader = new FileReader();
     reader.onload = (e) => {
-      const rawData = e.explicitOriginalTarget.result;
+      const rawData = e.target.result;
       csv({ noheader: true, output: "csv" })
         .fromString(rawData)
         .then((arrays) => {

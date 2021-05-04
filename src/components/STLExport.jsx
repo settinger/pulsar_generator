@@ -7,7 +7,6 @@ import stlSerializer from "@jscad/stl-serializer";
 const STLExport = (props) => {
   // We receive an array of polyhedra, we need to union them and then export as AMF
   const exportFile = () => {
-    console.log(props.input);
     if (!props.input || props.input.length < 1) return;
     const union = booleans.union(...props.input);
     const rawData = stlSerializer.serialize({ binary: true }, union);
