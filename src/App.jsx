@@ -47,7 +47,7 @@ export const App = () => {
     const radians = (newAngle * Math.PI) / 180;
     const newPolyhedra = makePolyhedra(polygons, radians);
     setPolyhedra(newPolyhedra);
-    setSolids(stack(newPolyhedra), spacing);
+    setSolids(stack(newPolyhedra, spacing)); // Aaaaagh why isn't this using the correct spacing value?
     setAngle(newAngle);
   };
 
