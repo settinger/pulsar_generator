@@ -1,11 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
 //import "./index.css";
-import App from "./App.jsx";
+import { App } from "./App.jsx";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <HelmetProvider>
+    <App>
+      <Helmet>
+        <title>3D Pulsar Generator</title>
+      </Helmet>
+    </App>
+  </HelmetProvider>,
   document.getElementById("root")
 );

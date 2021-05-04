@@ -1,18 +1,9 @@
-import React, { Component, Fragment } from "react";
+import React, { Fragment } from "react";
+import { Form, Button } from "react-bootstrap";
 import csv from "csvtojson";
 
-export default class CSVParser extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      errorMessage: undefined,
-    };
-    this.onUpload = this.onUpload.bind(this);
-    this.waveData = this.waveData.bind(this);
-  }
-
-  // Convert a 2-d array (from a CSV) into the pulsarX and pulsarY vectors expected by other components
-  waveData(arrays) {
+export const CSVParser = (props) => {
+  const waveData = (arrays) => {
     // I should put some sanity checks here to ensure that data is in the proper format.
     // But for now, assume the following:
     // 1. First row is x-axis values
@@ -22,11 +13,10 @@ export default class CSVParser extends Component {
     // 5. x-axis values are in increasing order
     const pulsarX = arrays[0].map((x) => parseFloat(x)); // Convert a 1-d array from strings to floats
     const pulsarY = arrays.slice(1).map((row) => row.map((y) => parseFloat(y))); // Convert a 2-d array from strings to floats
-    this.props.updatePulsarData(pulsarX, pulsarY);
-  }
+    props.updatePulsarData(pulsarX, pulsarY);
+  };
 
-  // Handle the file-reading and CSV parsing when user uploads their data
-  onUpload(event) {
+  const onUpload = (event) => {
     if (event?.target?.files?.length < 1) return;
     const uploadedFile = event.target.files[0];
     const reader = new FileReader();
@@ -35,22 +25,50 @@ export default class CSVParser extends Component {
       csv({ noheader: true, output: "csv" })
         .fromString(rawData)
         .then((arrays) => {
-          this.waveData(arrays);
+          waveData(arrays);
         });
     };
     reader.readAsText(uploadedFile);
-  }
+  };
 
-  render() {
-    return (
-      <Fragment>
-        <label htmlFor="upload">Upload .CSV file here: </label>
-        <input
-          type="file"
-          accept=".csv,text/csv"
-          onChange={this.onUpload}
-        ></input>
-      </Fragment>
-    );
-  }
-}
+  // Just make some random waves to test things out
+  const randomize = () => {
+    const xVals = new Array(10);
+    const yVals = new Array(10);
+
+    for (let i = 0; i < 10; i++) {
+      const yRow = new Array(10).fill(0).map((_) => Math.random());
+      xVals[i] = i;
+      yVals[i] = yRow;
+    }
+
+    props.updatePulsarData(xVals, yVals);
+  };
+
+  return (
+    <Fragment>
+      <Form>
+        <div className="custom-file" style={{ width: "60%", margin: "1em 0" }}>
+          <input
+            type="file"
+            className="custom-file-input"
+            id="csvUpload"
+            accept=".csv,text/csv"
+            onChange={onUpload}
+          />
+          <label htmlFor="csvUpload" className="custom-file-label">
+            Upload .CSV file here
+          </label>
+        </div>
+      </Form>
+      <p>
+        You can upload a .CSV file representing multiple line plots. Please
+        structure the .CSV file so the first row is the x-axis data, and each
+        subsequent row is the y-axis data for one of the waveforms. I know, it's
+        clunky.
+      </p>
+
+      <Button onClick={randomize}>Generate 10 random waves</Button>
+    </Fragment>
+  );
+};

@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React from "react";
 import { Button } from "react-bootstrap";
 import { booleans } from "@jscad/modeling";
-import { makeBlob } from "@jscad/io-utils";
 import stlSerializer from "@jscad/stl-serializer";
 
 const STLExport = (props) => {
