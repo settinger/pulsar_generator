@@ -45,7 +45,11 @@ export default class CSVParser extends Component {
     return (
       <Fragment>
         <label htmlFor="upload">Upload .CSV file here: </label>
-        <input type="file" accept="text/csv" onChange={this.onUpload}></input>
+        <input
+          type="file"
+          accept=".csv,text/csv"
+          onChange={this.onUpload}
+        ></input>
       </Fragment>
     );
   }
