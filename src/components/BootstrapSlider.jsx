@@ -10,7 +10,7 @@ const BootstrapSlider = (props) => {
   };
 
   return (
-    <Form style={{ width: "60%", padding: "1em" }}>
+    <Form style={{ width: "40em", padding: "1em" }}>
       <Form.Group>
         <Row>
           <Form.Label>{props.label}</Form.Label>

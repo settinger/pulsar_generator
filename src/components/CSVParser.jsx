@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import { Form, Button } from "react-bootstrap";
 import csv from "csvtojson";
 
-export const CSVParser = (props) => {
+const CSVParser = (props) => {
   const waveData = (arrays) => {
     // I should put some sanity checks here to ensure that data is in the proper format.
     // But for now, assume the following:
@@ -32,7 +32,7 @@ export const CSVParser = (props) => {
   };
 
   // Just make some random waves to test things out
-  const randomize = () => {
+  const randomize2 = () => {
     const xVals = new Array(10);
     const yVals = new Array(10);
 
@@ -44,11 +44,30 @@ export const CSVParser = (props) => {
 
     props.updatePulsarData(xVals, yVals);
   };
+  // Just make some random waves to test things out
+  const randomize = (waves = 20, points = 29) => {
+    const mu = (points + 1) / 2;
+    const sigma = points / 5;
+
+    // Apply normal distribution to points
+    const normal = (x) => {
+      return (
+        (1.5 * sigma * Math.exp(-0.5 * ((x - mu) / sigma) ** 2)) /
+        (Math.sqrt(2 * Math.PI) * sigma)
+      );
+    };
+    const xVals = new Array(points).fill(0).map((_, i) => i);
+    const yVals = new Array(waves).fill([]).map((_) => {
+      return new Array(points).fill(0).map((_, j) => Math.random() * normal(j));
+    });
+
+    props.updatePulsarData(xVals, yVals);
+  };
 
   return (
     <Fragment>
       <Form>
-        <div className="custom-file" style={{ width: "60%", margin: "1em 0" }}>
+        <div className="custom-file" style={{ width: "30em", margin: "1em 0" }}>
           <input
             type="file"
             className="custom-file-input"
@@ -68,7 +87,9 @@ export const CSVParser = (props) => {
         clunky.
       </p>
 
-      <Button onClick={randomize}>Generate 10 random waves</Button>
+      <Button onClick={randomize}>Generate 20 random waves</Button>
     </Fragment>
   );
 };
+
+export default CSVParser;
