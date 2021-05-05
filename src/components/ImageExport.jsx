@@ -1,35 +1,71 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Button } from "react-bootstrap";
 
 const ImageExport = (props) => {
-  // We receive an array of polyhedra, we need to union them and then export as AMF
-  const exportSVG = () => {
-    if (!props.board || !document.getElementById(props.board)) {
-      console.log("aaa");
-      return;
-    }
-    console.log(document.getElementById(props.board));
-    const serializer = new XMLSerializer();
-    const rawData = serializer.serializeToString(
-      document.getElementById(props.board)
-    );
-    const blob = new Blob([rawData], { type: "image/svg+xml" });
-
-    // How can I instigate a download without doing all this vanilla JS and ending it with a.click()?
-    const a = document.createElement("a");
-    const url = window.URL.createObjectURL(blob);
-    a.style.display = "none";
-    a.href = url;
-    a.download = "my_pulsar.svg";
-    a.click();
-    window.URL.revokeObjectURL(url);
+  // General "download a URL" function
+  const startDownload = (url, filename) => {
+    const $link = document.createElement("a");
+    $link.style.display = "none";
+    $link.href = url;
+    $link.download = filename;
+    $link.click();
+    $link.remove();
     document.activeElement.blur();
   };
 
+  // Export the board as an SVG (relatively straightforward since the DOM already contains an SVG element)
+  const exportSVG = () => {
+    if (!props.board || !document.getElementById(props.board)) return;
+    const $board = document.getElementById(props.board);
+    const blob = new Blob([$board.outerHTML], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const url = window.URL.createObjectURL(blob);
+    startDownload(url, "my_pulsar.svg");
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Export the board as a PNG (slightly tougher because we have to render the SVG onto a canvas before we can export it)
+  const exportPNG = () => {
+    if (!props.board || !document.getElementById(props.board)) return;
+    const $board = document.getElementById(props.board);
+    const { width, height } = $board.getBoundingClientRect();
+    const $boardClone = $board.cloneNode(true);
+
+    // Convert SVG data to a URL we can drop into a Canvas
+    const blob = new Blob([$board.outerHTML], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a canvas
+    const $canvas = document.createElement("canvas");
+    $canvas.width = width;
+    $canvas.height = height;
+    const context = $canvas.getContext("2d");
+
+    // Apply URL to an Image, put that Image into Canvas
+    const image = new Image();
+    image.onload = () => {
+      context.drawImage(image, 0, 0, width, height);
+      // Download canvas as PNG
+      const pngUrl = $canvas.toDataURL("image/png");
+      startDownload(pngUrl, "my_pulsar.png");
+      window.URL.revokeObjectURL(pngUrl);
+      window.URL.revokeObjectURL(url);
+    };
+    image.src = url;
+  };
+
   return (
-    <Button variant="primary" size="lg" onClick={exportSVG}>
-      Export .svg
-    </Button>
+    <Fragment>
+      <Button variant="primary" size="lg" onClick={exportSVG}>
+        Export .svg
+      </Button>
+      <Button variant="primary" size="lg" onClick={exportPNG}>
+        Export .png
+      </Button>
+    </Fragment>
   );
 };
 

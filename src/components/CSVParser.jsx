@@ -45,7 +45,7 @@ const CSVParser = (props) => {
     props.updatePulsarData(xVals, yVals);
   };
   // Just make some random waves to test things out
-  const randomize = (waves = 20, points = 29) => {
+  const randomize = (_, waves = 20, points = 29) => {
     const mu = (points + 1) / 2;
     const sigma = points / 5;
 
